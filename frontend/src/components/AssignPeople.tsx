@@ -9,7 +9,6 @@ const AssignPeople = ({ receipt, onAssigned }: { receipt: Receipt; onAssigned: (
     };
 
     const submitAssignments = async () => {
-        console.log(receipt)
         await assignItems(receipt.receiptId, assignments);
         onAssigned();
     };
