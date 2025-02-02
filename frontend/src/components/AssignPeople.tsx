@@ -73,14 +73,21 @@ const AssignPeople = ({ receipt, onAssigned }: { receipt: Receipt; onAssigned: (
 
             <h3>Items</h3>
             <ul>
-                {items.map((item) => (
-                    <li key={item.name} onClick={() => assignItem(item.name)}>
-                        <span>{item.name} - ${item.price.toFixed(2)}</span>
-                        <span>
-                            {assignments[item.name] ? `Assigned to ${assignments[item.name]}` : 'Click to assign'}
-                        </span>
-                    </li>
-                ))}
+                {items.map((item) => {
+                    const isAssigned = assignments[item.name];
+                    return (
+                        <li 
+                            key={item.name} 
+                            onClick={() => assignItem(item.name)}
+                            className={!isAssigned ? "unselected-item" : ""}
+                        >
+                            <span>{item.name} - ${item.price.toFixed(2)}</span>
+                            <span>
+                                {isAssigned ? `${assignments[item.name]}` : '...'}
+                            </span>
+                        </li>
+                    );
+                })}
             </ul>
 
             <button onClick={submitAssignments}>Submit Assignments</button>

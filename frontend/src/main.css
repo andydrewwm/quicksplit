@@ -71,6 +71,14 @@ li {
     background-color: #c8e6c9;
 }
 
+.unselected-item {
+    background-color: #fff9c4 !important; /* Light pastel yellow */
+    border: 1px solid #ffeb3b; /* Soft yellow border */
+    color: #5d4037; /* Dark brown text for contrast */
+    /* font-weight: bold; */
+}
+
+
 .selected-person {
     background-color: #c8e6c9 !important; /* Light green highlight for selected person */
     font-weight: bold;
@@ -90,3 +98,4 @@ li {
 .delete-btn:hover {
     background-color: #b71c1c; /* Darker red on hover */
 }
+
