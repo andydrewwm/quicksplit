@@ -9,7 +9,7 @@ const App = () => {
   const [assigned, setAssigned] = useState(false);
 
   return (
-    <div className='app-container'>
+    <div className="container">
       <h1>QuickSplit</h1>
 
       {!receipt ? (
@@ -23,4 +23,4 @@ const App = () => {
   );
 };
 
-export default App
+export default App;

@@ -6,8 +6,8 @@ const AssignPeople = ({ receipt, onAssigned }: { receipt: Receipt; onAssigned: (
     const [newPerson, setNewPerson] = useState('');
     const [assignments, setAssignments] = useState<{ [key: string]: string }>({});
     const [items, setItems] = useState(receipt.items);
+    const [selectedPerson, setSelectedPerson] = useState<string | null>(null);
 
-    // Add a new person
     const addPerson = () => {
         if (newPerson.trim() && !people.includes(newPerson)) {
             setPeople([...people, newPerson.trim()]);
@@ -15,7 +15,6 @@ const AssignPeople = ({ receipt, onAssigned }: { receipt: Receipt; onAssigned: (
         }
     };
 
-    // Remove a person and unassign their items
     const removePerson = (person: string) => {
         setPeople(people.filter(p => p !== person));
         setAssignments(prev => {
@@ -24,81 +23,67 @@ const AssignPeople = ({ receipt, onAssigned }: { receipt: Receipt; onAssigned: (
             );
             return updated;
         });
+        if (selectedPerson === person) setSelectedPerson(null);
     };
 
-    // Assign an item to a person
-    const assignItem = (itemName: string, person: string) => {
-        setAssignments(prev => ({ ...prev, [itemName]: person }));
+    const assignItem = (itemName: string) => {
+        if (!selectedPerson) return;
+        setAssignments(prev => ({ ...prev, [itemName]: selectedPerson }));
     };
 
-    // Remove an item and its assignment
-    const removeItem = (itemName: string) => {
-        setItems(items.filter(item => item.name !== itemName));
-        setAssignments(prev => {
-            const updated = { ...prev };
-            delete updated[itemName];
-            return updated;
-        });
-    };
-
-    // Submit assignments
     const submitAssignments = async () => {
         await assignItems(receipt.receiptId, assignments);
         onAssigned();
     };
 
     return (
-        <div className='assign-container'>
+        <div className="container">
             <h2>Assign Items</h2>
 
-            <div className='assign-grid'>
-                {/* People List */}
-                <div className='people-section'>
-                    <h3>People</h3>
-                    <div className='add-person'>
-                        <input
-                            type='text'
-                            placeholder='Enter name'
-                            value={newPerson}
-                            onChange={(e) => setNewPerson(e.target.value)}
-                        />
-                        <button onClick={addPerson}>Add</button>
-                    </div>
-
-                    <ul className='people-list'>
-                        {people.map((person) => (
-                            <li key={person} className='person-entry'>
-                                {person}
-                                <button className='remove-btn' onClick={() => removePerson(person)}>X</button>
-                            </li>
-                        ))}
-                    </ul>
+            <div>
+                <h3>People</h3>
+                <div>
+                    <input
+                        type='text'
+                        placeholder='Enter name'
+                        value={newPerson}
+                        onChange={(e) => setNewPerson(e.target.value)}
+                    />
+                    <button onClick={addPerson}>Add</button>
                 </div>
 
-                {/* Items List */}
-                <div className='items-section'>
-                    <h3>Items</h3>
-                    <ul className='items-list'>
-                        {items.map((item) => (
-                            <li key={item.name} className='item-entry'>
-                                <span>{item.name} - ${item.price.toFixed(2)}</span>
-                                <select
-                                    value={assignments[item.name] || ''}
-                                    onChange={(e) => assignItem(item.name, e.target.value)}
-                                >
-                                    <option value=''>Unassigned</option>
-                                    {people.map(person => (
-                                        <option key={person} value={person}>{person}</option>
-                                    ))}
-                                </select>
-                                <button className='remove-btn' onClick={() => removeItem(item.name)}>X</button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+                <ul>
+                    {people.map((person) => (
+                        <li 
+                            key={person} 
+                            onClick={() => setSelectedPerson(person)}
+                            className={selectedPerson === person ? "selected-person" : ""}
+                        >
+                            {person}
+                            <button 
+                                className="delete-btn" 
+                                onClick={(e) => { e.stopPropagation(); removePerson(person); }}
+                            >
+                                X
+                            </button>
+                        </li>
+                    ))}
+                </ul>
             </div>
 
-            <button onClick={submitAssignments} className='submit-btn'>Submit Assignments</button>
+            <h3>Items</h3>
+            <ul>
+                {items.map((item) => (
+                    <li key={item.name} onClick={() => assignItem(item.name)}>
+                        <span>{item.name} - ${item.price.toFixed(2)}</span>
+                        <span>
+                            {assignments[item.name] ? `Assigned to ${assignments[item.name]}` : 'Click to assign'}
+                        </span>
+                    </li>
+                ))}
+            </ul>
+
+            <button onClick={submitAssignments}>Submit Assignments</button>
         </div>
     );
 };

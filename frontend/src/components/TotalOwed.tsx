@@ -16,16 +16,14 @@ const TotalOwed = ({ receiptId }: { receiptId: string }) => {
     }, [receiptId]);
 
     return (
-        <div className='total-owed'>
+        <div className="container">
             <h2>Total Owed</h2>
             {loading ? (
                 <p>Calculating...</p>
             ) : (
                 <ul>
                     {Object.entries(totals).map(([person, amount]) => (
-                        <li key={person}>
-                            {person}: ${amount}
-                        </li>
+                        <li key={person}>{person}: ${amount.toFixed(2)}</li>
                     ))}
                 </ul>
             )}
