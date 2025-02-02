@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .routes import ocr, receipts
+from routes import ocr, receipts
 from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 

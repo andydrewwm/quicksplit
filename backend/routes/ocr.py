@@ -1,11 +1,18 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from PIL import Image
+from azure.ai.documentintelligence import DocumentIntelligenceClient
+from azure.core.credentials import AzureKeyCredential
+from database import receipts_collection
 import io
-import pytesseract
-from ..database import receipts_collection
+import pprint
+import os
 import logging
 
 router = APIRouter()
+
+AZURE_ENDPOINT = os.getenv("AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT")
+AZURE_KEY = os.getenv("AZURE_DOCUMENT_INTELLIGENCE_KEY")
+
+document_client = DocumentIntelligenceClient(AZURE_ENDPOINT, AzureKeyCredential(AZURE_KEY))
 
 @router.post("/upload-receipt")
 async def upload_receipt(file: UploadFile = File(...)):
@@ -13,31 +20,33 @@ async def upload_receipt(file: UploadFile = File(...)):
         # Log file info
         print(f"Received file: {file.filename}, content-type: {file.content_type}")
         
-        # Read and process image
+        # Read image content
         contents = await file.read()
-        image = Image.open(io.BytesIO(contents))
+        receipt_stream = io.BytesIO(contents)
         
-        # Perform OCR
-        text = pytesseract.image_to_string(image)
-        print(f"Extracted text: {text[:200]}...")  # Print first 200 chars
+        # Use Azure's prebuilt receipt model
+        poller = document_client.begin_analyze_document("prebuilt-receipt", receipt_stream)
+        result = poller.result()
+
+        if not result.documents:
+            raise HTTPException(status_code=400, detail="No receipt data detected")
         
-        # Parse items (make sure this matches your actual parsing logic)
+        receipt_data = result.documents[0].fields
+        
         items = []
-        lines = text.split("\n")
-        for line in lines:
-            parts = line.rsplit(" ", 1)
-            if len(parts) == 2:
-                name, price = parts
-                try:
-                    price = float(price.replace("$", ""))
-                    items.append({"name": name.strip(), "price": price})
-                except ValueError:
-                    continue
-        
+        for item in receipt_data.get("Items", {}).get("valueArray"):
+            name = item.get("valueObject", {}).get("Description", {}).get("content")
+            price = item.get("valueObject", {}).get("TotalPrice", {}).get("content")
+            print(name, price)
+            if name and price:
+                items.append({"name": name.strip(), "price": float(price.replace("$", "").replace(",", ""))})
+
+        # total_amount = receipt_data.get("Total", {}).get("valueCurrency", {}).get("amount", sum(item["price"] for item in items))
+
         # Create receipt document
         receipt = {
             "items": items,
-            "total_amount": sum(item["price"] for item in items)
+            # "total_amount": sum(item["price"] for item in items)
         }
         
         # Insert into database
@@ -46,7 +55,7 @@ async def upload_receipt(file: UploadFile = File(...)):
         return {
             "receipt_id": str(new_receipt.inserted_id),
             "items": items,
-            "total_amount": receipt["total_amount"]
+            # "total_amount": receipt["total_amount"]
         }
         
     except Exception as e:

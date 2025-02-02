@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from ..database import receipts_collection
-from ..models import Receipt
+from database import receipts_collection
+from models import Receipt
 from bson import ObjectId
 
 router = APIRouter()

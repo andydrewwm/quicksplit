@@ -1,9 +1,9 @@
+azure-ai-documentintelligence
 fastapi
-uvicorn
-pymongo
-motor
-python-dotenv
-requests
-python-multipart
-pytesseract
 fastapi-cors
+motor
+pymongo
+python-dotenv
+python-multipart
+requests
+uvicorn
