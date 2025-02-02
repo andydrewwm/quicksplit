@@ -53,9 +53,9 @@ async def upload_receipt(file: UploadFile = File(...)):
         new_receipt = await receipts_collection.insert_one(receipt)
         
         return {
-            "receipt_id": str(new_receipt.inserted_id),
+            "receiptId": str(new_receipt.inserted_id),
             "items": items,
-            # "total_amount": receipt["total_amount"]
+            # "totalAmount": receipt["total_amount"]
         }
         
     except Exception as e:
