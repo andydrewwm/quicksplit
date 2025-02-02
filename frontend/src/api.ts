@@ -19,10 +19,10 @@ export type Totals = {
 
 export const uploadReceipt = async (file: File): Promise<Receipt> => {
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append('file', file);
 
     const response = await axios.post(`${API_URL}/upload-receipt`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { 'Content-Type': 'multipart/form-data' },
     });
 
     return response.data;

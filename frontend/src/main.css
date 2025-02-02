@@ -1,0 +1,165 @@
+/* Global Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+}
+
+/* Main App Container */
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Receipt Upload Section */
+.dropzone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80%;
+    max-width: 400px;
+    height: 150px;
+    margin: 20px auto;
+    border: 2px dashed #007bff;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: center;
+    background-color: white;
+}
+
+.dropzone:hover {
+    background-color: #e9f5ff;
+}
+
+.dropzone p {
+    font-size: 16px;
+    color: #007bff;
+}
+
+/* Assign People Section */
+.assign-container {
+    max-width: 650px;
+    margin: auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* People & Items Section */
+.assign-grid {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.people-section,
+.items-section {
+    width: 48%;
+}
+
+h3 {
+    color: #333;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/* People List */
+.people-list,
+.items-list {
+    list-style: none;
+    padding: 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.person-entry,
+.item-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+    background: #f9f9f9;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+/* Assign Dropdown */
+select {
+    padding: 5px;
+    margin-left: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Add Person */
+.add-person {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.add-person input {
+    flex: 1;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.add-person button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+.add-person button:hover {
+    background: #0056b3;
+}
+
+/* Remove Buttons */
+button.remove-btn {
+    background: red;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+button.remove-btn:hover {
+    background: darkred;
+}
+
+/* Submit Button */
+button.submit-btn {
+    width: 100%;
+    margin-top: 15px;
+    padding: 10px;
+    background: green;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    transition: 0.3s;
+}
+
+button.submit-btn:hover {
+    background: darkgreen;
+}
+
+/* Assigned Items Highlight */
+.assigned {
+    background-color: #e3f2fd;
+    border-left: 4px solid #007bff;
+}

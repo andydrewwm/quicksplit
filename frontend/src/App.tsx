@@ -9,7 +9,7 @@ const App = () => {
   const [assigned, setAssigned] = useState(false);
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div className='app-container'>
       <h1>QuickSplit</h1>
 
       {!receipt ? (

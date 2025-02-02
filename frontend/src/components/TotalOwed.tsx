@@ -16,7 +16,7 @@ const TotalOwed = ({ receiptId }: { receiptId: string }) => {
     }, [receiptId]);
 
     return (
-        <div>
+        <div className='total-owed'>
             <h2>Total Owed</h2>
             {loading ? (
                 <p>Calculating...</p>

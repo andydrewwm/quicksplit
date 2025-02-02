@@ -15,8 +15,8 @@ const ReceiptUpload = ({ onUpload }: { onUpload: (receipt: Receipt) => void }) =
     const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
     return (
-        <div>
-            <div {...getRootProps()} style={{ border: '2px dashed black', padding: '20px', cursor: 'pointer' }}>
+        <div className='dropzone'>
+            <div {...getRootProps()}>
                 <input {...getInputProps()} />
                 <p>{loading ? 'Processing...' : 'Drop a receipt or click to upload'}</p>
             </div>
