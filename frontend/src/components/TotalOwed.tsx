@@ -24,7 +24,7 @@ const TotalOwed = ({ receiptId }: { receiptId: string }) => {
                 <ul>
                     {Object.entries(totals).map(([person, amount]) => (
                         <li key={person}>
-                            {person}: ${amount.toFixed(2)}
+                            {person}: ${amount}
                         </li>
                     ))}
                 </ul>

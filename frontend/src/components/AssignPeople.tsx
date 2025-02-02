@@ -9,6 +9,7 @@ const AssignPeople = ({ receipt, onAssigned }: { receipt: Receipt; onAssigned: (
     };
 
     const submitAssignments = async () => {
+        console.log(receipt)
         await assignItems(receipt.receiptId, assignments);
         onAssigned();
     };
@@ -18,7 +19,7 @@ const AssignPeople = ({ receipt, onAssigned }: { receipt: Receipt; onAssigned: (
             <h2>Assign Items</h2>
             {receipt.items.map((item, index) => (
                 <div key={index} style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-                    <span>{item.name} - ${item.price.toFixed(2)}</span>
+                    <span>{item.name} - ${item.price}</span>
                     <input
                         type='text'
                         placeholder="Person's name"

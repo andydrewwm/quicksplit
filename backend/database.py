@@ -6,7 +6,6 @@ import asyncio
 load_dotenv()
 
 MONGO_URI = os.getenv("MONGO_URI")
-print(f"Full URI being used: {MONGO_URI}")  # Be careful with this in production
 
 try:
     client = motor.motor_asyncio.AsyncIOMotorClient(
@@ -25,7 +24,7 @@ try:
     # Run the test
     asyncio.create_task(test_connection())
     
-    db = client.receipt_splitter
+    db = client.QuickSplit
     receipts_collection = db.receipts
     
 except Exception as e:
