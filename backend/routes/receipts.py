@@ -48,7 +48,6 @@ async def get_totals(receipt_id: str):
 
         sub_totals = {}
         for item in receipt["items"]:
-            item_subtotal += item["price"]
 
             if "assigned_to" in item and item["assigned_to"]:
                 person = item["assigned_to"]
@@ -56,13 +55,11 @@ async def get_totals(receipt_id: str):
                     sub_totals[person] = 0
             
                 sub_totals[person] += item["price"] 
-        
-        grand_totals = {}
-        for person, subtotal in sub_totals.items():
-            grand_totals[person] = subtotal + (subtotal / grand_total) * fees
-            grand_totals[person] = round(grand_totals[person], 2)
-        
-        return grand_totals
+        for person in sub_totals:
+            proportion = sub_totals[person] / sub_total
+            sub_totals[person] += round(fees * proportion,2)
+
+        return sub_totals
 
     except:
         return {"error": "Invalid receipt ID"}
