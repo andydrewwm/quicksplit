@@ -53,9 +53,9 @@ const AssignPeople = ({ receipt, onAssigned }: { receipt: Receipt; onAssigned: (
                 </div>
 
                 <ul>
-                    {people.map((person) => (
+                    {people.map((person, index) => (
                         <li 
-                            key={person} 
+                            key={`person-${index}-${person}`} 
                             onClick={() => setSelectedPerson(person)}
                             className={selectedPerson === person ? "selected-person" : ""}
                         >
@@ -73,11 +73,11 @@ const AssignPeople = ({ receipt, onAssigned }: { receipt: Receipt; onAssigned: (
 
             <h3>Items</h3>
             <ul>
-                {items.map((item) => {
+                {items.map((item, index) => {
                     const isAssigned = assignments[item.name];
                     return (
                         <li 
-                            key={item.name} 
+                            key={`item-${index}-${item.name}`} 
                             onClick={() => assignItem(item.name)}
                             className={!isAssigned ? "unselected-item" : ""}
                         >
