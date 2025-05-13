@@ -41,12 +41,17 @@ async def upload_receipt(file: UploadFile = File(...)):
             if name and price:
                 items.append({"name": name.strip(), "price": float(price.replace("$", "").replace(",", ""))})
 
-        # total_amount = receipt_data.get("Total", {}).get("valueCurrency", {}).get("amount", sum(item["price"] for item in items))
-
+        sub_total = sum(item["price"] for item in items)
+        doc_total = None
+        if "Total" in receipt_data:
+            doc_total = receipt_data.get("Total", {}).get("valueCurrency", {}).get("amount")
+            print(f"total: {doc_total}")
+        
         # Create receipt document
         receipt = {
             "items": items,
-            # "total_amount": sum(item["price"] for item in items)
+            "sub_total": sub_total,
+            "grand_total": doc_total if doc_total else sub_total,
         }
         
         # Insert into database
@@ -55,7 +60,8 @@ async def upload_receipt(file: UploadFile = File(...)):
         return {
             "receiptId": str(new_receipt.inserted_id),
             "items": items,
-            # "totalAmount": receipt["total_amount"]
+            "sub_total": receipt["sub_total"],
+            "grand_total": receipt["grand_total"]
         }
         
     except Exception as e:
