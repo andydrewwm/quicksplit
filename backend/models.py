@@ -3,14 +3,16 @@ from typing import List, Optional
 
 class Item(BaseModel): #pydantics model automatically validates datatypes and converts JSON to python <-->
     name: str
+    quantity: int
     price: float
-    assigned_to: Optional[str] = None  # Name of person
+    assigned_to: Optional[str] = None 
 
 class Receipt(BaseModel):
-    user_id: str
-    total_amount: float
+    merchant_name: str
+    date: str
     items: List[Item]
+    subtotal: float
+    tax: Optional[float] = None
+    tip: Optional[float] = None
+    total_amount: float
 
-class Person(BaseModel):
-    name: str
-    total_owed: float
