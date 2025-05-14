@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 from database import receipts_collection
-from models import Receipt
 from bson import ObjectId
 
 router = APIRouter()
@@ -41,12 +40,26 @@ async def get_totals(receipt_id: str):
         receipt = await receipts_collection.find_one({"_id": object_id})
         if not receipt:
             return {"error": "Receipt not found"}
+        
+        sub_total = receipt.get("sub_total", 0)
+        grand_total = receipt.get("grand_total", sub_total)
 
-        totals = {}
+        fees = grand_total - sub_total
+
+        sub_totals = {}
         for item in receipt["items"]:
-            if item["assigned_to"]:
-                totals[item["assigned_to"]] = totals.get(item["assigned_to"], 0) + item["price"]
 
-        return totals
+            if "assigned_to" in item and item["assigned_to"]:
+                person = item["assigned_to"]
+                if person not in sub_totals:
+                    sub_totals[person] = 0
+            
+                sub_totals[person] += item["price"] 
+        for person in sub_totals:
+            proportion = sub_totals[person] / sub_total
+            sub_totals[person] += round(fees * proportion,2)
+
+        return sub_totals
+
     except:
         return {"error": "Invalid receipt ID"}
