@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, status
 from azure.ai.documentintelligence import DocumentIntelligenceClient
 from azure.core.credentials import AzureKeyCredential
 from database import receipts_collection
@@ -6,6 +6,8 @@ import io
 import pprint
 import os
 import logging
+from models import Item, Receipt
+from bson import ObjectId
 
 router = APIRouter()
 
@@ -14,7 +16,12 @@ AZURE_KEY = os.getenv("AZURE_DOCUMENT_INTELLIGENCE_KEY")
 
 document_client = DocumentIntelligenceClient(AZURE_ENDPOINT, AzureKeyCredential(AZURE_KEY))
 
-@router.post("/upload-receipt")
+@router.post(
+    "/upload-receipt/",
+    response_model=Receipt,
+    response_model_by_alias=False,
+    status_code=status.HTTP_201_CREATED
+)
 async def upload_receipt(file: UploadFile = File(...)):
     try:
         # Log file info
@@ -39,30 +46,30 @@ async def upload_receipt(file: UploadFile = File(...)):
             price = item.get("valueObject", {}).get("TotalPrice", {}).get("content")
             print(name, price)
             if name and price:
-                items.append({"name": name.strip(), "price": float(price.replace("$", "").replace(",", ""))})
+                items.append(Item(id=str(ObjectId()), name=name.strip(), price=float(price.replace("$", "").replace(",", ""))))
 
-        sub_total = sum(item["price"] for item in items)
+        sub_total = sum(item.price for item in items)
         doc_total = None
         if "Total" in receipt_data:
             doc_total = receipt_data.get("Total", {}).get("valueCurrency", {}).get("amount")
             print(f"total: {doc_total}")
         
         # Create receipt document
-        receipt = {
-            "items": items,
-            "sub_total": sub_total,
-            "grand_total": doc_total if doc_total else sub_total,
-        }
+        receipt = Receipt(
+            items=items,
+            subtotal=sub_total,
+            total=(doc_total if doc_total else sub_total)
+        )
         
         # Insert into database
-        new_receipt = await receipts_collection.insert_one(receipt)
+        new_receipt = await receipts_collection.insert_one(
+            receipt.model_dump(by_alias=True, exclude=["id"])
+        )
+        created_receipt = await receipts_collection.find_one(
+            {"_id": new_receipt.inserted_id}
+        )
         
-        return {
-            "receiptId": str(new_receipt.inserted_id),
-            "items": items,
-            "sub_total": receipt["sub_total"],
-            "grand_total": receipt["grand_total"]
-        }
+        return created_receipt
         
     except Exception as e:
         print(f"Error processing receipt: {str(e)}")  # Log the error

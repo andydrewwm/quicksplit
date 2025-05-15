@@ -17,7 +17,7 @@ const App = () => {
       ) : !assigned ? (
         <AssignPeople receipt={receipt} onAssigned={() => setAssigned(true)} />
       ) : (
-        <TotalOwed receiptId={receipt.receiptId} />
+        <TotalOwed receiptId={receipt.id} />
       )}
     </div>
   );
