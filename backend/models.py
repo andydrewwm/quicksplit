@@ -1,18 +1,44 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
+from pydantic.functional_validators import BeforeValidator
 from typing import List, Optional
+from typing_extensions import Annotated
 
-class Item(BaseModel): #pydantics model automatically validates datatypes and converts JSON to python <-->
+# MongoDB ObjectId as string for Pydantic/JSON compatibility
+PyObjectId = Annotated[str, BeforeValidator(str)]
+
+class Item(BaseModel):
+    """
+    Represents an item on a receipt.
+    """
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
     name: str
-    quantity: int
     price: float
-    assigned_to: Optional[str] = None 
+    quantity: Optional[int] = None
+    assigned_to: Optional[str] = None
+    model_config = ConfigDict(populate_by_name=True)
 
 class Receipt(BaseModel):
-    merchant_name: str
-    date: str
+    """
+    Represents a receipt containing multiple items.
+    """
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    merchant_name: Optional[str] = None
+    date: Optional[str] = None
     items: List[Item]
     subtotal: float
     tax: Optional[float] = None
     tip: Optional[float] = None
-    total_amount: float
+    total: float
+    model_config = ConfigDict(populate_by_name=True)
 
+class ReceiptUpdate(BaseModel):
+    """
+    Model for updating a receipt. All fields are optional.
+    """
+    merchant_name: Optional[str] = None
+    date: Optional[str] = None
+    items: Optional[List[Item]] = None
+    subtotal: Optional[float] = None
+    tax: Optional[float] = None
+    tip: Optional[float] = None
+    total: Optional[float] = None
