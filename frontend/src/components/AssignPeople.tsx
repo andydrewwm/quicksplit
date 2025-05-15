@@ -4,7 +4,6 @@ import { assignItems, Receipt } from '../api';
 const AssignPeople = ({ receipt, onAssigned }: { receipt: Receipt; onAssigned: () => void }) => {
     const [people, setPeople] = useState<string[]>([]);
     const [newPerson, setNewPerson] = useState('');
-    const [assignments, setAssignments] = useState<{ [key: string]: string }>({});
     const [items, setItems] = useState(receipt.items);
     const [selectedPerson, setSelectedPerson] = useState<string | null>(null);
 
@@ -17,24 +16,35 @@ const AssignPeople = ({ receipt, onAssigned }: { receipt: Receipt; onAssigned: (
 
     const removePerson = (person: string) => {
         setPeople(people.filter(p => p !== person));
-        setAssignments(prev => {
-            const updated = Object.fromEntries(
-                Object.entries(prev).filter(([_, assignedTo]) => assignedTo !== person)
-            );
-            return updated;
-        });
+        setItems(prev =>
+            prev.map(item =>
+                item.assigned_to === person
+                ? { ...item, assigned_to: undefined }
+                : item
+            )
+        );
         if (selectedPerson === person) setSelectedPerson(null);
     };
 
-    const assignItem = (itemName: string) => {
+    const assignItem = (itemId: string) => {
         if (!selectedPerson) return;
-        setAssignments(prev => ({ ...prev, [itemName]: selectedPerson }));
+        setItems(prev =>
+            prev.map(item =>
+                item.id === itemId 
+                ? { ...item, assigned_to: selectedPerson }
+                : item
+            )
+        );
+        // console.log(receipt);
     };
 
     const submitAssignments = async () => {
-        await assignItems(receipt.receiptId, assignments);
+        receipt.items = items;
+        await assignItems(receipt.id, receipt);
         onAssigned();
     };
+
+    console.log(receipt);
 
     return (
         <div className="container">
@@ -53,9 +63,9 @@ const AssignPeople = ({ receipt, onAssigned }: { receipt: Receipt; onAssigned: (
                 </div>
 
                 <ul>
-                    {people.map((person, index) => (
+                    {people.map(person => (
                         <li 
-                            key={`person-${index}-${person}`} 
+                            key={person} 
                             onClick={() => setSelectedPerson(person)}
                             className={selectedPerson === person ? "selected-person" : ""}
                         >
@@ -73,17 +83,16 @@ const AssignPeople = ({ receipt, onAssigned }: { receipt: Receipt; onAssigned: (
 
             <h3>Items</h3>
             <ul>
-                {items.map((item, index) => {
-                    const isAssigned = assignments[item.name];
+                {items.map(item => {
                     return (
                         <li 
-                            key={`item-${index}-${item.name}`} 
-                            onClick={() => assignItem(item.name)}
-                            className={!isAssigned ? "unselected-item" : ""}
+                            key={item.id}
+                            onClick={() => assignItem(item.id)}
+                            className={!item.assigned_to ? "unselected-item" : ""}
                         >
                             <span>{item.name} - ${item.price.toFixed(2)}</span>
                             <span>
-                                {isAssigned ? `${assignments[item.name]}` : '...'}
+                                {item.assigned_to ? `${item.assigned_to}` : '...'}
                             </span>
                         </li>
                     );
