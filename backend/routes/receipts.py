@@ -11,7 +11,7 @@ router = APIRouter()
     response_model=Receipt,
     response_model_by_alias=False
 )
-async def assign_items(id: str, receipt: ReceiptUpdate = Body(...)):
+async def update_items(id: str, receipt: ReceiptUpdate = Body(...)):
     receipt = {
         k: v for k, v in receipt.model_dump(by_alias=True).items() if v is not None
     }

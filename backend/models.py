@@ -26,8 +26,6 @@ class Receipt(BaseModel):
     date: Optional[str] = None
     items: List[Item]
     subtotal: float
-    tax: Optional[float] = None
-    tip: Optional[float] = None
     total: float
     model_config = ConfigDict(populate_by_name=True)
 
@@ -39,6 +37,4 @@ class ReceiptUpdate(BaseModel):
     date: Optional[str] = None
     items: Optional[List[Item]] = None
     subtotal: Optional[float] = None
-    tax: Optional[float] = None
-    tip: Optional[float] = None
     total: Optional[float] = None

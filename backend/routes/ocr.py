@@ -39,7 +39,16 @@ async def upload_receipt(file: UploadFile = File(...)):
             raise HTTPException(status_code=400, detail="No receipt data detected")
         
         receipt_data = result.documents[0].fields
+
+        ## Get Merchant Name
+        merchant_name = receipt_data.get("MerchantName", {}).get("content")
+        print(f"Merchant Name: {merchant_name}")
+
+        ## Get Date
+        date = receipt_data.get("TransactionDate", {}).get("content")
+        print(f"Date: {date}")
         
+        ## Get Items
         items = []
         for item in receipt_data.get("Items", {}).get("valueArray"):
             name = item.get("valueObject", {}).get("Description", {}).get("content")
@@ -48,7 +57,16 @@ async def upload_receipt(file: UploadFile = File(...)):
             if name and price:
                 items.append(Item(id=str(ObjectId()), name=name.strip(), price=float(price.replace("$", "").replace(",", ""))))
 
+        ## Get Subtotal
         sub_total = sum(item.price for item in items)
+        if "Subtotal" in receipt_data:
+            sub_total_ocr = receipt_data.get("Subtotal", {}).get("valueCurrency", {}).get("amount")
+            print(f"subtotal: {sub_total}")
+            if float(sub_total_ocr) != float(sub_total):
+                print(f"OCR subtotal {sub_total_ocr} does not match calculated subtotal {sub_total}")
+                sub_total = float(sub_total_ocr)
+
+        ## Get Total
         doc_total = None
         if "Total" in receipt_data:
             doc_total = receipt_data.get("Total", {}).get("valueCurrency", {}).get("amount")
@@ -56,6 +74,8 @@ async def upload_receipt(file: UploadFile = File(...)):
         
         # Create receipt document
         receipt = Receipt(
+            merchant_name=merchant_name,
+            date=date,
             items=items,
             subtotal=sub_total,
             total=(doc_total if doc_total else sub_total)

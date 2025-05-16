@@ -16,8 +16,6 @@ export type Receipt = {
     date?: string;
     items: Item[];
     subtotal: number;
-    tax?: number;
-    tip?: number;
     total: number;
 };
 
